@@ -1,0 +1,1302 @@
+
+╭─── Claude Code v2.1.34 ──────────────────────────────────────────────────────╮
+│                                              │ Tips for getting started      │
+│          Welcome back Tech Shottify!         │ Run /init to create a CLAUDE… │
+│                                              │ ───────────────────────────── │
+│                    ▐▛███▜▌                   │ Recent activity               │
+│                   ▝▜█████▛▘                  │ No recent activity            │
+│                     ▘▘ ▝▝                    │                               │
+│                                              │                               │
+│            Opus 4.6 · Claude Max             │                               │
+│   F:\Codes\Awesome-Wireless-Communications   │                               │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+❯     - The BS must simultaneously serve multiple users on the same         
+  time-frequency resource                                                   
+      - Beamforming must spatially separate users                           
+      - This dramatically increases system capacity (spatial multiplexing   
+  gain)                                                                     
+  =============                                                             
+  Can you explain these lines?                                              
+  How the BS support multiple users on the same time-frequency? Explain me  
+  theoretically and mathematically.                                         
+  This dramatically increases system capacity (spatial multiplexing gain) - 
+   Explain me how this increases system capacity. Explain me spatial gain,  
+  both theoretically and mathematically.                                    
+
+● Multi-User MIMO: Spatial Multiplexing via Beamforming
+
+  1. Serving Multiple Users on the Same Time-Frequency Resource
+
+  The Core Idea
+
+  In traditional systems (e.g., OFDMA), each user gets a separate time-frequency
+   slot. Only one user occupies a given resource block at a time. This is
+  wasteful when the BS has multiple antennas.
+
+  In MU-MIMO, the BS exploits its antenna array to create spatially distinct
+  beams — each beam targets a different user. All users share the exact same
+  time slot and frequency band, but are separated in the spatial domain.
+
+  Mathematical Model
+
+  Consider a BS with M antennas serving K users (each with 1 antenna) on the
+  same time-frequency resource.
+
+  Channel model:
+
+  The channel from the BS to user k is a vector:
+
+  $$\mathbf{h}_k \in \mathbb{C}^{M \times 1}, \quad k = 1, 2, \ldots, K$$
+
+  The BS transmits a superposition of all users' signals:
+
+  $$\mathbf{x} = \sum_{k=1}^{K} \mathbf{w}_k s_k$$
+
+  where:
+  - s_k is the data symbol for user k (scalar)
+  - w_k ∈ C^{M×1} is the beamforming vector (precoding vector) for user k
+  - x ∈ C^{M×1} is the transmitted signal vector across M antennas
+
+  What each user receives:
+
+  User k receives:
+
+  $$y_k = \mathbf{h}_k^H \mathbf{x} + n_k = \mathbf{h}_k^H \mathbf{w}k s_k +
+  \sum{j \neq k} \mathbf{h}_k^H \mathbf{w}_j s_j + n_k$$
+
+  Breaking this down:
+  Term: h_k^H w_k s_k
+  Meaning: Desired signal for user k
+  ────────────────────────────────────────
+  Term: Σ_{j≠k} h_k^H w_j s_j
+  Meaning: Inter-user interference (other users' signals leaking in)
+  ────────────────────────────────────────
+  Term: n_k
+  Meaning: Additive noise
+  How Beamforming Separates Users
+
+  The BS designs w_k so that:
+
+  1. Maximize |h_k^H w_k| — strong signal toward user k
+  2. Minimize |h_k^H w_j| for j ≠ k — suppress interference at user k from other
+   beams
+
+  Example — Zero-Forcing (ZF) Beamforming:
+
+  Stack all channels into a matrix:
+
+  $$\mathbf{H} = [\mathbf{h}_1, \mathbf{h}_2, \ldots, \mathbf{h}_K]^H \in
+  \mathbb{C}^{K \times M}$$
+
+  The ZF precoder computes:
+
+  $$\mathbf{W}_{ZF} = \mathbf{H}^H (\mathbf{H} \mathbf{H}^H)^{-1}$$
+
+  This ensures:
+
+  $$\mathbf{H} \mathbf{W}_{ZF} = \mathbf{I}_K$$
+
+  Meaning h_k^H w_j = 0 for all j ≠ k. The inter-user interference is completely
+   eliminated. Each user sees only their own signal as if they were alone in the
+   system.
+
+  Physical intuition: Each beamforming vector w_k shapes the antenna radiation
+  pattern to form a beam toward user k while placing nulls (zeros) in the
+  directions of all other users.
+
+  Requirement
+
+  This works when M ≥ K (at least as many antennas as users). The BS needs 
+  enough spatial degrees of freedom (antennas) to create independent beams.
+
+  ---
+  2. How This Increases System Capacity (Spatial Multiplexing Gain)
+
+  Without MU-MIMO (Single User per Resource)
+
+  If only one user is served per time-frequency resource, user k's rate is:
+
+  $$R_{single} = \log_2\left(1 + \frac{P |\mathbf{h}_k|^2}{\sigma^2}\right)$$
+
+  The system serves K users by dividing resources (time/frequency) among them.
+  Each user gets a fraction 1/K of the total resource, so the sum rate is
+  approximately:
+
+  $$R_{sum}^{TDMA} = \sum_{k=1}^{K} \frac{1}{K} \log_2\left(1 + \frac{P
+  |\mathbf{h}_k|^2}{\sigma^2}\right)$$
+
+  Each user's share shrinks as K grows. Adding users divides the pie.
+
+  With MU-MIMO (K Users on Same Resource)
+
+  All K users are served simultaneously on the full resource. With ZF 
+  beamforming, user k's rate is:
+
+  $$R_k = \log_2\left(1 + \frac{p_k |\mathbf{h}_k^H
+  \mathbf{w}_k|^2}{\sigma^2}\right)$$
+
+  The sum rate is:
+
+  $$R_{sum}^{MU-MIMO} = \sum_{k=1}^{K} \log_2\left(1 + \text{SINR}_k\right)$$
+
+  No 1/K factor — every user gets the full bandwidth simultaneously.
+
+  The Spatial Multiplexing Gain
+
+  At high SNR, the sum capacity scales as:
+
+  $$R_{sum} \approx K \cdot \log_2(\text{SNR}) \quad \text{(high SNR)}$$
+
+  where K = min(M, K_users) independent streams can be supported.
+
+  Compare with single-user:
+
+  $$R_{single} \approx 1 \cdot \log_2(\text{SNR})$$
+
+  The spatial multiplexing gain is:
+
+  $$\boxed{G_{spatial} = \min(M, K)}$$
+
+  This means:
+  - With M = 64 antennas serving K = 16 users, you get roughly a 16× increase in
+   sum throughput compared to serving one user at a time
+  - Each additional antenna at the BS adds another spatial degree of freedom
+  - Each additional user (up to M) adds another independent data stream
+
+  Numerical Example
+  ┌───────────────┬────────┐
+  │   Parameter   │ Value  │
+  ├───────────────┼────────┤
+  │ BS antennas M │ 8      │
+  ├───────────────┼────────┤
+  │ Users K       │ 4      │
+  ├───────────────┼────────┤
+  │ SNR per user  │ 20 dB  │
+  ├───────────────┼────────┤
+  │ Bandwidth     │ 10 MHz │
+  └───────────────┴────────┘
+  TDMA (one user at a time):
+  R_sum = 4 × (1/4) × 10MHz × log2(1 + 100) ≈ 10 × 6.66 = 66.6 Mbps
+
+  MU-MIMO with ZF (4 users simultaneously):
+  R_sum = 4 × 10MHz × log2(1 + SNR_eff)
+        ≈ 4 × 10 × 5.6 = 224 Mbps
+  (SNR_eff is reduced somewhat due to ZF power sharing, but the 4× multiplexing
+  gain dominates)
+
+  Roughly a 3-4× throughput improvement with just 4 spatial streams.
+
+  Summary
+  ┌───────────────────────────┬──────────────────┬───────────────────────┐
+  │          Concept          │   Single-User    │        MU-MIMO        │
+  ├───────────────────────────┼──────────────────┼───────────────────────┤
+  │ Resources per user        │ 1/K of time-freq │ Full time-freq        │
+  ├───────────────────────────┼──────────────────┼───────────────────────┤
+  │ Separation method         │ Time/Frequency   │ Spatial (beamforming) │
+  ├───────────────────────────┼──────────────────┼───────────────────────┤
+  │ Sum rate scaling          │ log2(SNR)        │ K · log2(SNR)         │
+  ├───────────────────────────┼──────────────────┼───────────────────────┤
+  │ Spatial multiplexing gain │ 1                │ min(M, K)             │
+  └───────────────────────────┴──────────────────┴───────────────────────┘
+  The key insight: multiple antennas create a multi-dimensional signal space.
+  Each dimension can carry an independent data stream to a different user. This
+  is "free" capacity that comes from space, without needing more bandwidth or
+  time — hence spatial multiplexing gain.
+
+✻ Cooked for 42s
+
+❯ Your mathematical response isn't understandable:                          
+    $R_{single} = \log_2\left(1 + \frac{P                                   
+  |\mathbf{h}_k|^2}{\sigma^2}\right)$                                       
+                                                                            
+    The system serves K users by dividing resources (time/frequency) among  
+  them. Each user gets a                                                    
+    fraction 1/K of the total resource, so the sum rate is approximately:   
+                                                                            
+    $R_{sum}^{TDMA} = \sum_{k=1}^{K} \frac{1}{K} \log_2\left(1 + \frac{P    
+    |\mathbf{h}_k|^2}{\sigma^2}\right)$                                     
+                                                                            
+    Each user's share shrinks as K grows. Adding users divides the pie.     
+                                                                            
+    With MU-MIMO (K Users on Same Resource)                                 
+                                                                            
+    All K users are served simultaneously on the full resource. With ZF     
+  beamforming, user k's rate                                                
+    is:                                                                     
+                                                                            
+    $R_k = \log_2\left(1 + \frac{p_k |\mathbf{h}_k^H                        
+  \mathbf{w}_k|^2}{\sigma^2}\right)$                                        
+                                                                            
+    The sum rate is:                                                        
+                                                                            
+    $R_{sum}^{MU-MIMO} = \sum_{k=1}^{K} \log_2\left(1 +                     
+  \text{SINR}_k\right)$                                                     
+                                                                            
+    No 1/K factor — every user gets the full bandwidth simultaneously.      
+                                                                            
+    The Spatial Multiplexing Gain                                           
+                                                                            
+    At high SNR, the sum capacity scales as:                                
+                                                                            
+    $R_{sum} \approx K \cdot \log_2(\text{SNR}) \quad \text{(high SNR)}$    
+                                                                            
+    where K = min(M, K_users) independent streams can be supported.         
+                                                                            
+    Compare with single-user:                                               
+                                                                            
+    $R_{single} \approx 1 \cdot \log_2(\text{SNR})$                         
+                                                                            
+    The spatial multiplexing gain is:                                       
+                                                                            
+    $\boxed{G_{spatial} = \min(M, K)}$                                      
+  ---------------                                                           
+  Recreate your whole response and this for mathematical part use proper    
+  conventional sign so that I can understand like it is written in a book.  
+
+● The terminal can't render LaTeX math. Let me create an HTML document with
+  properly rendered equations that you can open in your browser — it will look
+  like a textbook.
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ No need to create a html document just write it in the chat but it is     
+  understandable like a textbook.                                           
+
+● Multi-User MIMO: Spatial Multiplexing via Beamforming
+
+  ---
+  Part 1: How the BS Serves Multiple Users on the Same Time-Frequency Resource
+
+  The Problem
+
+  In traditional systems (TDMA/OFDMA), if you have 4 users, you split the
+  resource into 4 slots. Each user gets 1/4 of the pie. Wasteful.
+
+  In MU-MIMO, all users share the entire resource simultaneously. The BS uses 
+  its antenna array to point separate beams at separate users. Separation
+  happens in space, not in time or frequency.
+
+  System Setup
+
+  - BS has M antennas
+  - K users, each with 1 antenna
+  - All K users transmit/receive on the same time slot and same frequency
+
+  The Channel
+
+  The channel from BS to user k is a vector of length M:
+
+      h_k = [ h_k1, h_k2, ..., h_kM ]^T
+
+  Each element h_km is the complex channel gain between BS antenna m and user k.
+   This vector captures both the magnitude and direction of user k in space.
+
+  What the BS Transmits
+
+  The BS wants to send symbol s_k to user k. It multiplies each user's symbol by
+   a beamforming vector w_k (also length M), then adds them all up:
+
+      x = w_1 · s_1  +  w_2 · s_2  +  ...  +  w_K · s_K
+
+  This vector x is what the M antennas actually radiate. Each antenna sends a
+  weighted combination of all users' data.
+
+  What User k Receives
+
+  User k has a single antenna. It receives:
+
+      y_k  =  h_k^H · x  +  noise
+
+           =  h_k^H · w_k · s_k   +   Σ(j≠k)  h_k^H · w_j · s_j   +   n_k
+               ─────────────────       ──────────────────────────────     ────
+                Desired signal          Inter-user interference           Noise
+
+  Here h_k^H means the conjugate transpose (Hermitian) of h_k. The product h_k^H
+   · w_j is a scalar — it tells you how much of beam j leaks into user k.
+
+  The Goal of Beamforming
+
+  Design each w_k so that:
+
+      h_k^H · w_k  →  LARGE     (strong desired signal)
+      h_k^H · w_j  →  SMALL     for all j ≠ k  (suppress interference)
+
+  Physically: point a strong beam at user k, and place nulls (silence) toward
+  all other users.
+
+  Zero-Forcing (ZF) Solution
+
+  Stack all user channels into one matrix:
+
+           ┌  ── h_1^H ──  ┐
+      H  = │  ── h_2^H ──  │      (K rows, M columns)
+           │     ...        │
+           └  ── h_K^H ──  ┘
+
+  The ZF precoding matrix is:
+
+      W_ZF  =  H^H · ( H · H^H )^(-1)
+
+  This gives us K beamforming vectors (the columns of W_ZF). The beautiful
+  property:
+
+      H · W_ZF  =  I_K    (K × K identity matrix)
+
+  Which means:
+
+      h_k^H · w_k = 1      (desired signal preserved)
+      h_k^H · w_j = 0      for j ≠ k  (interference completely killed)
+
+  Each user sees only their own symbol, as if they were alone in the system. The
+   interference is zero.
+
+  Requirement: This needs M ≥ K (at least as many BS antennas as users).
+
+  ---
+  Part 2: Why This Increases Capacity — Spatial Multiplexing Gain
+
+  Baseline: TDMA (One User at a Time)
+
+  With K users sharing the resource by time division, each user gets fraction 
+  1/K of the time. User k's rate:
+
+                      1                   P · ‖h_k‖²
+      R_k(TDMA)  =  ─── · log₂ ( 1  +  ──────────── )
+                      K                      σ²
+
+  where:
+  - P = transmit power
+  - ‖h_k‖² = channel power (sum of squared magnitudes of all M channel elements)
+  - σ² = noise power
+
+  The total system throughput (sum rate):
+
+                        K
+                       ───
+                       ╲       1                   P · ‖h_k‖²
+      R_sum(TDMA)  =   ╱      ─── · log₂ ( 1  +  ──────────── )
+                       ───     K                      σ²
+                       k=1
+
+  Notice the 1/K in front. As you add more users, each user's share shrinks. You
+   are dividing the same pie into more slices.
+
+  MU-MIMO: All Users Simultaneously
+
+  With ZF beamforming, interference is zero. User k's rate:
+
+                                        p_k · | h_k^H · w_k |²
+      R_k(MU-MIMO)  =  log₂ ( 1  +   ────────────────────────── )
+                                                σ²
+
+  where p_k is the power allocated to user k.
+
+  The total system throughput:
+
+                          K
+                         ───
+                         ╲
+      R_sum(MU-MIMO)  =  ╱    log₂ ( 1  +  SINR_k )
+                         ───
+                         k=1
+
+  No 1/K factor. Every user gets the full bandwidth, the full time. Nothing is
+  divided.
+
+  Direct Comparison
+
+  Let's simplify to see the gain clearly. Assume all users have equal SNR =
+  P/σ².
+
+  TDMA sum rate:
+
+      R_sum(TDMA)  ≈  K · (1/K) · log₂(1 + SNR)  =  1 · log₂(1 + SNR)
+
+  No matter how many users you add, the sum rate stays roughly the same — you
+  just redistribute the same capacity.
+
+  MU-MIMO sum rate:
+
+      R_sum(MU-MIMO)  ≈  K · log₂(1 + SNR/K)
+
+  (The SNR/K comes from splitting total power among K beams.)
+
+  At high SNR, this simplifies to:
+
+      R_sum(MU-MIMO)  ≈  K · log₂(SNR)
+
+  versus TDMA:
+
+      R_sum(TDMA)  ≈  1 · log₂(SNR)
+
+  The Spatial Multiplexing Gain
+
+  The ratio:
+
+                     R_sum(MU-MIMO)       K · log₂(SNR)
+      G_spatial  =  ────────────────  ≈  ────────────────  =  K
+                     R_sum(TDMA)          1 · log₂(SNR)
+
+  More precisely:
+
+      ┌─────────────────────────────────────┐
+      │                                     │
+      │    G_spatial  =  min( M , K )       │
+      │                                     │
+      └─────────────────────────────────────┘
+
+  - You cannot have more independent beams than antennas (limited by M)
+  - You cannot have more streams than users (limited by K)
+  - So the gain is the smaller of the two
+
+  What This Means in Practice
+
+      M = 64 antennas,  K = 16 users
+
+      G_spatial = min(64, 16) = 16
+
+      → 16× more total throughput than TDMA on the same bandwidth
+
+  Numerical Example
+
+      M = 8 antennas,  K = 4 users,  SNR = 20 dB (= 100),  BW = 10 MHz
+
+  TDMA:
+      R_sum = 4 × (1/4) × 10 MHz × log₂(1 + 100)
+            = 1 × 10 MHz × 6.66
+            = 66.6 Mbps
+
+  MU-MIMO (ZF):
+      R_sum = 4 × 10 MHz × log₂(1 + 25)       [SNR/K = 100/4 = 25]
+            = 4 × 10 MHz × 4.7
+            = 188 Mbps
+
+  Gain ≈ 188 / 66.6 ≈ 2.8× (close to K = 4 at finite SNR)
+
+  ---
+  Summary Table
+
+  ┌─────────────────────┬────────────────────────┬──────────────────────────┐
+  │                     │  TDMA (conventional)   │   MU-MIMO (beamforming)  │
+  ├─────────────────────┼────────────────────────┼──────────────────────────┤
+  │ Resource per user   │  1/K of time or freq   │  Full time and freq      │
+  │ User separation     │  Time or Frequency     │  Space (beams)           │
+  │ Sum rate scaling    │  1 · log₂(SNR)         │  K · log₂(SNR)          │
+  │ Multiplexing gain   │  1                     │  min(M, K)              │
+  │ Requirement         │  None                  │  M ≥ K antennas at BS   │
+  └─────────────────────┴────────────────────────┴──────────────────────────┘
+
+  The fundamental insight: Each BS antenna adds one spatial dimension. Each
+  dimension carries one independent data stream. More antennas = more dimensions
+   = more simultaneous users = more total throughput, all without needing extra
+  bandwidth or time. That is the spatial multiplexing gain.
+
+✻ Churned for 47s
+
+❯ Can you explain the Zero-Forcing solution step by step with an example? 
+
+● Zero-Forcing Beamforming: Step-by-Step Example
+
+  ---
+  Setup
+
+      BS has M = 2 antennas
+      K = 2 users, each with 1 antenna
+      Both users share the same time and frequency
+
+  ---
+  Step 1: Define the Channels
+
+  Each user's channel is a vector of length M = 2. These represent the complex
+  gains from each BS antenna to that user.
+
+      User 1:   h_1 = [ 1 + j ]     (from BS antenna 1 to user 1)
+                      [ 2 - j ]     (from BS antenna 2 to user 1)
+
+      User 2:   h_2 = [ 2 + j ]
+                      [ 1 + 2j]
+
+  (In practice these come from channel estimation. Here we just pick simple
+  numbers.)
+
+  ---
+  Step 2: Build the Channel Matrix H
+
+  Stack each user's channel as a row (using conjugate transpose h^H):
+
+      h_1^H = [ 1-j ,  2+j ]       (conjugate of h_1, written as row)
+      h_2^H = [ 2-j ,  1-2j]       (conjugate of h_2, written as row)
+
+           ┌                 ┐
+      H  = │  1-j    2+j     │     (K × M  =  2 × 2)
+           │  2-j    1-2j    │
+           └                 ┘
+
+  Note on conjugate: flip the sign of the imaginary part.
+      1+j  →  1-j
+      2-j  →  2+j
+      2+j  →  2-j
+      1+2j →  1-2j
+
+  ---
+  Step 3: Compute H^H (Conjugate Transpose of H)
+
+  Transpose H and conjugate each entry:
+
+                ┌                 ┐
+      H^H   =  │  1+j    2+j     │     (M × K  =  2 × 2)
+                │  2-j    1+2j    │
+                └                 ┘
+
+  ---
+  Step 4: Compute the Gram Matrix  G = H · H^H
+
+  This is a K × K matrix (2 × 2 here):
+
+      G  =  H · H^H
+
+      G(1,1) = h_1^H · h_1 = (1-j)(1+j) + (2+j)(2-j)
+             = (1+1) + (4+1)
+             = 2 + 5 = 7
+
+      G(1,2) = h_1^H · h_2 = (1-j)(2+j) + (2+j)(1+2j)
+             = (2+j-2j-j²) + (2+4j+j+2j²)
+             = (2-j+1) + (2+5j-2)
+             = (3-j) + (5j)
+             = 3 + 4j
+
+      G(2,1) = conjugate of G(1,2) = 3 - 4j
+
+      G(2,2) = h_2^H · h_2 = (2-j)(2+j) + (1-2j)(1+2j)
+             = (4+1) + (1+4)
+             = 5 + 5 = 10
+
+                ┌                  ┐
+      G     =   │   7      3+4j   │
+                │  3-4j     10    │
+                └                  ┘
+
+  ---
+  Step 5: Compute G^(-1)  (Inverse of the Gram Matrix)
+
+  For a 2×2 matrix:
+
+           ┌       ┐              ┌          ┐
+           │  a  b  │    -1     1 │   d  -b  │
+           │  c  d  │   =  ───── │  -c   a  │
+           └       ┘      det    └          ┘
+
+  Determinant:
+
+      det(G) = 7 × 10  -  (3+4j)(3-4j)
+             = 70  -  (9 + 16)
+             = 70 - 25
+             = 45
+
+  So:
+
+                       1   ┌                   ┐
+      G^(-1)  =  ────────  │   10     -(3+4j)  │
+                    45     │  -(3-4j)    7     │
+                           └                   ┘
+
+                ┌                            ┐
+      G^(-1) =  │  10/45      -(3+4j)/45    │
+                │  -(3-4j)/45     7/45      │
+                └                            ┘
+
+  Simplify:
+
+                ┌                               ┐
+      G^(-1) =  │   2/9       -(3+4j)/45       │
+                │  -(3-4j)/45     7/45          │
+                └                               ┘
+
+  ---
+  Step 6: Compute the ZF Precoding Matrix  W = H^H · G^(-1)
+
+      W  =  H^H · (H · H^H)^(-1)
+
+           ┌                 ┐     ┌                               ┐
+      W =  │  1+j    2+j     │  ×  │   2/9       -(3+4j)/45       │
+           │  2-j    1+2j    │     │  -(3-4j)/45     7/45          │
+           └                 ┘     └                               ┘
+
+           (2 × 2)  ×  (2 × 2)  =  (2 × 2)
+
+  The columns of W are the beamforming vectors:
+
+      W = [ w_1 | w_2 ]
+
+  Column 1 → w_1 (beam for user 1):
+
+      w_1(1) = (1+j)(2/9) + (2+j)(-(3-4j)/45)
+
+             = (2+2j)/9  +  (2+j)(-(3-4j))/45
+
+      First compute (2+j)(-(3-4j)):
+             = -(6-8j+3j-4j²)
+             = -(6-5j+4)
+             = -(10-5j)
+             = -10+5j
+
+      So:  w_1(1) = (2+2j)/9  +  (-10+5j)/45
+                  = (10+10j)/45  +  (-10+5j)/45
+                  = (0 + 15j)/45
+                  = j/3
+
+
+      w_1(2) = (2-j)(2/9) + (1+2j)(-(3-4j)/45)
+
+             = (4-2j)/9  +  (1+2j)(-(3-4j))/45
+
+      Compute (1+2j)(-(3-4j)):
+             = -(3-4j+6j-8j²)
+             = -(3+2j+8)
+             = -(11+2j)
+             = -11-2j
+
+      So:  w_1(2) = (4-2j)/9  +  (-11-2j)/45
+                  = (20-10j)/45  +  (-11-2j)/45
+                  = (9 - 12j)/45
+                  = (3 - 4j)/15
+
+                ┌          ┐
+      w_1   =   │    j/3   │
+                │(3-4j)/15 │
+                └          ┘
+
+  Column 2 → w_2 (beam for user 2):
+
+      w_2(1) = (1+j)(-(3+4j)/45) + (2+j)(7/45)
+
+      Compute (1+j)(-(3+4j)):
+             = -(3+4j+3j+4j²)
+             = -(3+7j-4)
+             = -(-1+7j)
+             = 1-7j
+
+      So:  w_2(1) = (1-7j)/45  +  (14+7j)/45
+                  = (15 + 0j)/45
+                  = 1/3
+
+
+      w_2(2) = (2-j)(-(3+4j)/45) + (1+2j)(7/45)
+
+      Compute (2-j)(-(3+4j)):
+             = -(6+8j-3j-4j²)
+             = -(6+5j+4)
+             = -(10+5j)
+             = -10-5j
+
+      So:  w_2(2) = (-10-5j)/45  +  (7+14j)/45
+                  = (-3 + 9j)/45
+                  = (-1 + 3j)/15
+
+                ┌            ┐
+      w_2   =   │    1/3     │
+                │(-1+3j)/15  │
+                └            ┘
+
+  ---
+  Step 7: Verify — Does ZF Actually Work?
+
+  The whole point: H · W = I (identity). Let's check.
+
+  Check h_1^H · w_1  (should be 1):
+
+      h_1^H · w_1  =  (1-j)(j/3)  +  (2+j)(3-4j)/15
+
+      First term:  (1-j)(j/3) = (j - j²)/3 = (j+1)/3 = (1+j)/3
+
+      Second term: (2+j)(3-4j)/15 = (6-8j+3j-4j²)/15
+                                  = (6-5j+4)/15
+                                  = (10-5j)/15
+                                  = (2-j)/3
+
+      Sum = (1+j)/3  +  (2-j)/3  =  3/3  =  1   ✓
+
+  Check h_2^H · w_1  (should be 0):
+
+      h_2^H · w_1  =  (2-j)(j/3)  +  (1-2j)(3-4j)/15
+
+      First term:  (2-j)(j/3) = (2j-j²)/3 = (2j+1)/3 = (1+2j)/3
+
+      Second term: (1-2j)(3-4j)/15 = (3-4j-6j+8j²)/15
+                                   = (3-10j-8)/15
+                                   = (-5-10j)/15
+                                   = (-1-2j)/3
+
+      Sum = (1+2j)/3  +  (-1-2j)/3  =  0/3  =  0   ✓
+
+  Check h_1^H · w_2  (should be 0):
+
+      h_1^H · w_2  =  (1-j)(1/3)  +  (2+j)(-1+3j)/15
+
+      First term:  (1-j)/3
+
+      Second term: (2+j)(-1+3j)/15 = (-2+6j-j+3j²)/15
+                                   = (-2+5j-3)/15
+                                   = (-5+5j)/15
+                                   = (-1+j)/3
+
+      Sum = (1-j)/3  +  (-1+j)/3  =  0/3  =  0   ✓
+
+  Check h_2^H · w_2  (should be 1):
+
+      h_2^H · w_2  =  (2-j)(1/3)  +  (1-2j)(-1+3j)/15
+
+      First term:  (2-j)/3
+
+      Second term: (1-2j)(-1+3j)/15 = (-1+3j+2j-6j²)/15
+                                    = (-1+5j+6)/15
+                                    = (5+5j)/15
+                                    = (1+j)/3
+
+      Sum = (2-j)/3  +  (1+j)/3  =  3/3  =  1   ✓
+
+  Result:
+
+                    ┌      ┐
+      H · W    =   │  1  0 │   =   I₂    ✓ ✓ ✓
+                    │  0  1 │
+                    └      ┘
+
+  ---
+  Step 8: What Each User Actually Receives
+
+  BS transmits:
+
+      x  =  w_1 · s_1  +  w_2 · s_2
+
+  User 1 receives:
+
+      y_1  =  h_1^H · x
+           =  h_1^H · w_1 · s_1  +  h_1^H · w_2 · s_2
+           =      1 · s_1         +      0 · s_2
+           =  s_1
+
+      → User 1 sees ONLY their own symbol. Zero interference.
+
+  User 2 receives:
+
+      y_2  =  h_2^H · x
+           =  h_2^H · w_1 · s_1  +  h_2^H · w_2 · s_2
+           =      0 · s_1         +      1 · s_2
+           =  s_2
+
+      → User 2 sees ONLY their own symbol. Zero interference.
+
+  ---
+  Physical Picture
+
+                          User 1 (h_1)
+                         ╱
+      ┌───┐   beam 1   ╱
+      │ A1├────────────●
+      │   │  ╲
+      │   │    ╲ null toward User 2
+      │ BS│
+      │   │    ╱ null toward User 1
+      │   │  ╱
+      │ A2├────────────●
+      └───┘   beam 2    ╲
+                         ╲
+                          User 2 (h_2)
+
+  - w_1 shapes the array so that energy goes to User 1 and a null (zero) falls
+  on User 2
+  - w_2 shapes the array so that energy goes to User 2 and a null falls on User
+  1
+  - Both beams exist at the same time, same frequency — separated only in space
+
+  ---
+  Summary of the ZF Recipe
+
+      Step 1:  Estimate channels h_1, h_2, ..., h_K
+      Step 2:  Stack into H  (K × M matrix)
+      Step 3:  Compute H^H
+      Step 4:  Compute Gram matrix  G = H · H^H
+      Step 5:  Invert it → G^(-1)
+      Step 6:  Precoding matrix  W = H^H · G^(-1)
+      Step 7:  Transmit  x = W · s = w_1·s_1 + w_2·s_2 + ... + w_K·s_K
+
+      Result:  Each user receives only their own symbol.
+               H · W = I  guarantees zero inter-user interference.
+
+✻ Crunched for 56s
+
+❯ =========================                                                 
+  I want you to explain these following question in details. For            
+  mathematical part, use conventional sign so that your answer looks like   
+  the part of a book.                                                       
+  1.     - THz channels exhibit frequency-selective fading (different       
+  frequencies experience different attenuation)                             
+  - What are different frequencies? Why do we need different frequencies?   
+  Why can't we use single frequencies?                                      
+  2.  OFDM converts a frequency-selective channel into multiple flat-fading 
+   subchannels                                                              
+  - How this happen? Explain mathematically.                                
+  3. Each subcarrier experiences approximately flat fading, simplifying     
+  equalization                                                              
+  - Explain these line theoretically and mathematically.                    
+
+● OFDM in THz Channels: Complete Explanation
+
+  ---
+  Question 1: What Are Different Frequencies and Why Do We Need Them?
+
+  What "Different Frequencies" Means
+
+  When we say a system uses "different frequencies," we mean the transmitted
+  signal occupies a band of frequencies, not a single tone.
+
+  A single frequency (a pure sinusoid) looks like:
+
+      x(t) = A · cos(2π · f₀ · t)
+
+  This carries zero information. It just oscillates forever with no change. To
+  carry data, you must change something — the amplitude, phase, or frequency —
+  over time. The moment you change anything, the signal spreads across a range
+  of frequencies.
+
+  Why a Single Frequency Cannot Carry Data
+
+  A fundamental result from Fourier analysis:
+
+      ┌──────────────────────────────────────────────────────────────┐
+      │  A signal confined to a single frequency carries no          │
+      │  information. To transmit R bits/second, you need at         │
+      │  least R/2 Hz of bandwidth.                                  │
+      │                                                              │
+      │  This is the Nyquist limit:  R  ≤  2B                       │
+      │                                                              │
+      │  where B = bandwidth in Hz, R = symbol rate in symbols/sec   │
+      └──────────────────────────────────────────────────────────────┘
+
+  Example: To send 1 Gbps of data, you need hundreds of MHz of bandwidth. Your
+  signal will span from some frequency f_low to f_high:
+
+      B = f_high - f_low
+
+      e.g.,  f_low = 300 GHz,  f_high = 300.5 GHz  →  B = 500 MHz
+
+  The signal occupies all frequencies between f_low and f_high simultaneously.
+  These are the "different frequencies."
+
+  Time Domain View: Why Modulation Spreads the Spectrum
+
+  Suppose you transmit a sequence of pulses (symbols), each of duration T:
+
+      x(t) = Σ  s_n · p(t - nT)
+             n
+
+  where s_n is the n-th data symbol and p(t) is a pulse shape.
+
+  In the frequency domain, this signal has a bandwidth of approximately:
+
+      B  ≈  1/T
+
+  Shorter symbols (faster data rate) → wider bandwidth → more frequencies
+  involved.
+
+      T = 1 ns   →   B ≈ 1 GHz    (signal spans 1 GHz of frequencies)
+      T = 1 μs   →   B ≈ 1 MHz    (signal spans 1 MHz of frequencies)
+
+  At THz bands, we want extreme data rates (100+ Gbps), so we need enormous
+  bandwidths (tens of GHz). The signal spreads across a huge range of
+  frequencies.
+
+  What Is Frequency-Selective Fading?
+
+  When a signal travels from transmitter to receiver, it takes multiple paths 
+  (reflections, scattering). Each path has a different delay:
+
+      Path 1:  delay τ₁,  gain α₁
+      Path 2:  delay τ₂,  gain α₂
+      Path 3:  delay τ₃,  gain α₃
+         ...
+
+  The channel impulse response is:
+
+      h(τ)  =  α₁ · δ(τ - τ₁)  +  α₂ · δ(τ - τ₂)  +  α₃ · δ(τ - τ₃)  + ...
+
+  In the frequency domain (take the Fourier transform):
+
+      H(f)  =  α₁ · e^(-j2πfτ₁)  +  α₂ · e^(-j2πfτ₂)  +  α₃ · e^(-j2πfτ₃)  + ...
+
+  Notice: H(f) is a sum of complex exponentials at different frequencies. These
+  add up constructively at some frequencies and destructively at others.
+
+      At frequency f_A:   H(f_A) might be large   (paths add up)
+      At frequency f_B:   H(f_B) might be small   (paths cancel out)
+
+  This is frequency-selective fading: different frequencies within your signal
+  bandwidth experience different gains.
+
+  The key condition:
+
+      ┌─────────────────────────────────────────────────────────────┐
+      │  Frequency-selective fading occurs when:                    │
+      │                                                             │
+      │       B  >  B_c      (signal bandwidth > coherence BW)     │
+      │                                                             │
+      │  where coherence bandwidth  B_c  ≈  1 / τ_max              │
+      │  and τ_max = maximum excess delay spread of the channel     │
+      └─────────────────────────────────────────────────────────────┘
+
+  At THz frequencies, the bandwidth B can be 10-50 GHz, while the coherence
+  bandwidth might be only a few hundred MHz. So:
+
+      B = 10 GHz  >>  B_c = 200 MHz
+
+      → Severely frequency-selective
+
+  The channel looks completely different at f = 300.0 GHz versus f = 300.5 GHz
+  versus f = 301.0 GHz, etc.
+
+  ---
+  Question 2: How OFDM Converts Frequency-Selective into Flat Fading
+
+  The Problem
+
+  In the time domain, when you send a symbol through a frequency-selective
+  channel, the multipath delays cause the symbol to smear into neighboring 
+  symbols. This is inter-symbol interference (ISI).
+
+  Without OFDM, the received signal is:
+
+      y(t) = h(τ) * x(t) + n(t)       (* means convolution)
+
+           = ∫ h(τ) · x(t - τ) dτ  +  n(t)
+
+  The convolution mixes up the symbols. Undoing this requires a complex
+  equalizer.
+
+  The OFDM Idea
+
+  Instead of sending one fast stream over the full bandwidth B, split it into N
+  slow streams over N narrow subbands:
+
+      Full bandwidth:   B  (frequency-selective)
+
+      Split into N subcarriers, each of width:
+
+          Δf = B / N
+
+  Choose N large enough so that each subband is narrower than the coherence 
+  bandwidth:
+
+      ┌─────────────────────────────────────────────────────────────┐
+      │                                                             │
+      │       Δf  =  B/N   <<   B_c   ≈  1/τ_max                  │
+      │                                                             │
+      │  Equivalently:   N  >>  B · τ_max                          │
+      │                                                             │
+      └─────────────────────────────────────────────────────────────┘
+
+  Within each narrow subband, the channel is approximately constant (flat).
+
+  Mathematical Derivation
+
+  Step 1: The OFDM Transmit Signal
+
+  We have N data symbols for one OFDM symbol period: S[0], S[1], ..., S[N-1].
+
+  Each symbol modulates a different subcarrier frequency. The k-th subcarrier
+  has frequency:
+
+      f_k  =  f_0  +  k · Δf,      k = 0, 1, ..., N-1
+
+  The transmitted baseband signal is the Inverse DFT (IDFT):
+
+                       1    N-1
+      x[n]  =  ──────  Σ    S[k] · e^(j2πkn/N),     n = 0, 1, ..., N-1
+                √N    k=0
+
+  This is exactly the IDFT of the frequency-domain symbols S[k]. Each sample
+  x[n] is a superposition of all subcarrier signals.
+
+  Step 2: Add the Cyclic Prefix (CP)
+
+  Before transmission, copy the last L samples and prepend them:
+
+      Original:  [ x[0], x[1], ..., x[N-1] ]          (N samples)
+
+      With CP:   [ x[N-L], ..., x[N-1], x[0], x[1], ..., x[N-1] ]
+                  ─────────────────────
+                   Cyclic prefix (L samples)
+
+  where L ≥ channel length (number of multipath taps). This is the key trick.
+
+  Step 3: Transmission Through the Channel
+
+  The discrete-time channel has L+1 taps:
+
+      h[0], h[1], ..., h[L]
+
+  The received signal (after passing through the channel) is a linear
+  convolution:
+
+                    L
+      y[n]  =  Σ   h[l] · x[n-l]   +   noise[n]
+               l=0
+
+  Because of the cyclic prefix, the linear convolution becomes a circular
+  convolution over the N-point block:
+
+                    L
+      y[n]  =  Σ   h[l] · x[(n-l) mod N]   +   noise[n]
+               l=0
+
+  This is the crucial step. The CP makes the channel's effect on the block
+  circular.
+
+  Step 4: Apply DFT at the Receiver
+
+  The receiver discards the CP and takes the N-point DFT of y[n]:
+
+                       1    N-1
+      Y[k]  =  ──────  Σ    y[n] · e^(-j2πkn/N),     k = 0, 1, ..., N-1
+                √N    n=0
+
+  Now here is the key mathematical property:
+
+      ┌──────────────────────────────────────────────────────────────┐
+      │                                                              │
+      │   DFT of circular convolution = pointwise multiplication     │
+      │                                                              │
+      │   If   y[n] = h[n] ⊛ x[n]    (circular convolution)        │
+      │                                                              │
+      │   Then Y[k] = H[k] · X[k]    (simple multiplication)        │
+      │                                                              │
+      └──────────────────────────────────────────────────────────────┘
+
+  where H[k] is the DFT of the channel taps:
+
+                    L
+      H[k]  =  Σ   h[l] · e^(-j2πkl/N),     k = 0, 1, ..., N-1
+               l=0
+
+  So the received signal in the frequency domain is:
+
+      ┌───────────────────────────────────────────────┐
+      │                                               │
+      │   Y[k]  =  H[k] · S[k]  +  N[k]             │
+      │                                               │
+      │   for each k = 0, 1, ..., N-1                 │
+      │                                               │
+      └───────────────────────────────────────────────┘
+
+  where:
+  - Y[k] = received symbol on subcarrier k
+  - H[k] = channel gain on subcarrier k (a single complex number)
+  - S[k] = transmitted symbol on subcarrier k
+  - N[k] = noise on subcarrier k
+
+  This is the magic. Each subcarrier sees a single complex multiplication by
+  H[k]. No convolution. No ISI. The frequency-selective channel has been
+  decomposed into N independent flat-fading scalar channels.
+
+  Visual Summary
+
+      BEFORE OFDM (time domain, wideband):
+
+      Transmit:  s₁  s₂  s₃  s₄  s₅  s₆  ...
+                    ╲ ╱ ╲ ╱ ╲ ╱
+      Channel:     multipath causes ISI
+                    ╱ ╲ ╱ ╲ ╱ ╲
+      Receive:   mixed-up symbols → complex equalization needed
+
+
+      AFTER OFDM (frequency domain, per-subcarrier):
+
+      Subcarrier 0:   Y[0] = H[0] · S[0] + N[0]     ← flat fading
+      Subcarrier 1:   Y[1] = H[1] · S[1] + N[1]     ← flat fading
+      Subcarrier 2:   Y[2] = H[2] · S[2] + N[2]     ← flat fading
+         ...             ...
+      Subcarrier N-1: Y[N-1] = H[N-1] · S[N-1] + N[N-1]  ← flat fading
+
+      Each line is independent. No mixing between subcarriers.
+
+  ---
+  Question 3: Flat Fading Per Subcarrier Simplifies Equalization
+
+  What Equalization Means
+
+  Equalization = recovering the original transmitted symbol S[k] from the
+  received signal Y[k], undoing the channel's distortion.
+
+  Without OFDM: The Nightmare
+
+  In a wideband system without OFDM, the received signal in the time domain is:
+
+                    L
+      y[n]  =  Σ   h[l] · s[n-l]  +  noise[n]
+               l=0
+
+  To recover s[n], you need to solve a system where each received sample depends
+   on L+1 transmitted symbols. This requires:
+
+  - Matrix inversion of size proportional to L
+  - Complexity: O(L²) or O(L³) per symbol
+  - For THz channels with huge bandwidth, L can be very large (hundreds or
+  thousands of taps)
+
+  In matrix form:
+
+      y = H_conv · s + n
+
+  where H_conv is a large Toeplitz (banded) convolution matrix:
+
+                ┌                                      ┐
+                │ h[0]   0      0     ...    0         │
+                │ h[1]  h[0]    0     ...    0         │
+      H_conv =  │ h[2]  h[1]  h[0]   ...    0         │
+                │  ...   ...   ...    ...   ...        │
+                │  0     ...   h[L]  h[L-1] ... h[0]   │
+                └                                      ┘
+
+  The equalizer must compute:
+
+      ŝ  =  (H_conv^H · H_conv)^(-1) · H_conv^H · y
+
+  This is a massive matrix inversion — expensive and numerically sensitive.
+
+  With OFDM: Trivially Simple
+
+  On each subcarrier, the equation is:
+
+      Y[k]  =  H[k] · S[k]  +  N[k]
+
+  This is a scalar equation. H[k] is just one complex number. Recovering S[k] is
+   a single division:
+
+      ┌─────────────────────────────────────────────────┐
+      │                                                 │
+      │              Y[k]       H[k] · S[k] + N[k]     │
+      │   Ŝ[k]  =  ──────  =  ────────────────────     │
+      │              H[k]            H[k]               │
+      │                                                 │
+      │          =  S[k]  +  N[k]/H[k]                  │
+      │                                                 │
+      └─────────────────────────────────────────────────┘
+
+  This is called zero-forcing equalization per subcarrier. One complex division
+  per subcarrier. That's it.
+
+  Why This Is "Flat Fading"
+
+  On subcarrier k, the channel gain H[k] is a single complex number that is
+  approximately constant across the narrow subcarrier bandwidth Δf:
+
+      Within subcarrier k:
+
+      H(f)  ≈  H[k]  =  constant      for  f_k - Δf/2  <  f  <  f_k + Δf/2
+
+  This is the definition of flat fading: the channel does not vary across the
+  signal bandwidth. When flat:
+
+  - No ISI within that subcarrier
+  - No frequency-dependent distortion
+  - The symbol is just scaled and rotated by one complex number
+  - Recovery is one division
+
+  MMSE Equalizer (Slightly Better)
+
+  ZF equalization (dividing by H[k]) amplifies noise when H[k] is small. The
+  MMSE equalizer balances noise and interference:
+
+                        H[k]*
+      Ŝ[k]  =  ─────────────────── · Y[k]
+                 |H[k]|² + σ²/P
+
+  where:
+  - H[k]* = complex conjugate of H[k]
+  - σ² = noise power
+  - P = signal power
+
+  Still a scalar operation per subcarrier. Still trivially simple.
+
+  Complexity Comparison
+
+      ┌────────────────────────┬──────────────────────────────────┐
+      │     Without OFDM       │        With OFDM                 │
+      ├────────────────────────┼──────────────────────────────────┤
+      │                        │                                  │
+      │  Equalization:         │  Equalization:                   │
+      │  Matrix inversion      │  N scalar divisions              │
+      │  O(L²) or O(L³)       │  O(N)                            │
+      │  per symbol            │  total for all N subcarriers     │
+      │                        │                                  │
+      │  Plus OFDM overhead:   │  Plus:                           │
+      │  Not applicable        │  One N-point FFT: O(N log N)     │
+      │                        │                                  │
+      │  Total: O(L³)          │  Total: O(N log N)               │
+      │  Very expensive        │  Very efficient                  │
+      │                        │                                  │
+      └────────────────────────┴──────────────────────────────────┘
+
+  Numerical example for THz:
+
+      B = 10 GHz,   τ_max = 50 ns,   L = B · τ_max = 500 taps
+
+      Without OFDM:   O(500³) = O(125,000,000)  operations per symbol
+      With OFDM:      N = 2048,  O(2048 × log₂2048) = O(22,528) operations
+                      + 2048 divisions
+
+      Speedup:  ~5000×
+
+  Complete OFDM Processing Chain
+
+      TRANSMITTER                              RECEIVER
+      ──────────                               ────────
+
+      S[0],S[1],...,S[N-1]                     Y[0],Y[1],...,Y[N-1]
+           │                                        ▲
+           ▼                                        │
+      ┌─────────┐                              ┌─────────┐
+      │  IDFT   │                              │   DFT   │
+      │ (IFFT)  │                              │  (FFT)  │
+      └────┬────┘                              └────┬────┘
+           │                                        │
+           ▼                                        │
+      x[0],x[1],...,x[N-1]                     y[0],y[1],...,y[N-1]
+           │                                        ▲
+           ▼                                        │
+      ┌──────────┐                             ┌──────────┐
+      │  Add CP  │                             │Remove CP │
+      └────┬─────┘                             └────┬─────┘
+           │                                        │
+           ▼                                        │
+      ┌──────────────────────────────────────────────┐
+      │          Multipath Channel h[l]              │
+      │   (frequency-selective, causes ISI)          │
+      └──────────────────────────────────────────────┘
+
+      After DFT at receiver, for each subcarrier:
+
+           Y[k] = H[k] · S[k] + N[k]     ← FLAT. Just divide by H[k].
+
+  ---
+  Summary
+  Question: Why not single frequency?
+  Answer: A single frequency carries zero information. Data requires bandwidth,
+    which means many frequencies.
+  ────────────────────────────────────────
+  Question: What causes frequency-selective fading?
+  Answer: Multipath. Different frequencies add up differently depending on path
+    delays. Occurs when B > B_c.
+  ────────────────────────────────────────
+  Question: How does OFDM fix it?
+  Answer: Cyclic prefix turns linear convolution into circular convolution. DFT
+    converts circular convolution into pointwise multiplication. Each
+    subcarrier sees Y[k] = H[k]·S[k] + N[k].
+  ────────────────────────────────────────
+  Question: Why is equalization simple?
+  Answer: Each subcarrier is a scalar equation. Recovery is one division: Ŝ[k] =
+
+    Y[k]/H[k]. No matrix inversion needed. Complexity drops from O(L³) to
+    O(N log N).
+
+✻ Cooked for 1m 37s
